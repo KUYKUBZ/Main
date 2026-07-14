@@ -124,12 +124,52 @@ local Plrs = game:GetService("Players")
 local Plr = Plrs.LocalPlayer
 
 local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local TeleportService = game:GetService("TeleportService")
 
 local VIM = game:GetService("VirtualInputManager")
 local VirtualUser = game:GetService("VirtualUser")
 local Rep = game:GetService("ReplicatedStorage")
 local Events = Rep:WaitForChild("Events", 10)
 local Vehicles = Events and Events:WaitForChild("Vehicles", 10)
+
+local placeId = game.PlaceId
+local jobId = game.JobId
+
+local function teleportToLowPlayerServer()
+    local url = "https://games.roblox.com/v1/games/" .. placeId .. "/servers/Public?sortOrder=Asc&limit=100"
+    
+    local success, result = pcall(function()
+        return game:HttpGet(url)
+    end)
+
+    if success and result then
+        local data = HttpService:JSONDecode(result)
+        if data and data.data then
+            local bestServer = nil
+            for _, server in ipairs(data.data) do
+                if server.id ~= jobId and server.playing < 2 then
+                    if not bestServer or server.playing < bestServer.playing then
+                        bestServer = server
+                    end
+                elseif server.id ~= jobId and server.playing < 4 then
+                    if not bestServer or server.playing < bestServer.playing then
+                        bestServer = server
+                    end
+                end
+            end
+            
+            if bestServer then
+                TeleportService:TeleportToPlaceInstance(placeId, bestServer.id, Plr)
+            end
+        end
+    end
+end
+
+spawn(function()
+task.wait(1800)
+teleportToLowPlayerServer()
+end)
 
 task.spawn(function()
     if typeof(getgc) == "function" then
