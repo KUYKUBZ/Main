@@ -1,1 +1,224 @@
-<h1>Hello from idkkub</h1>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAITUNMOBILE - API Link Bypass</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-size: 14px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: none;
+            animation: fadeInOut 2s ease-in-out;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; bottom: 10px; }
+            15% { opacity: 1; bottom: 20px; }
+            85% { opacity: 1; bottom: 20px; }
+            100% { opacity: 0; bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>KAITUNMOBILE Bypass</h2>
+    
+    <!-- ช่องใส่ API Key (ถ้ามี ให้ใส่ค่าเริ่มต้นไว้ใน value ได้เลยครับ) -->
+    <div class="form-group">
+        <label for="apiKey">API Key (จากเว็บ KAITUNMOBILE)</label>
+        <input type="text" id="apiKey" placeholder="ใส่ API Key ของคุณที่นี่" value="">
+    </div>
+
+    <!-- ช่องใส่ลิงก์ที่ต้องการทำรายการ -->
+    <div class="form-group">
+        <label for="targetLink">วางลิงก์ที่นี่</label>
+        <input type="text" id="targetLink" placeholder="https://example.com/...">
+    </div>
+
+    <button id="submitBtn" onclick="handleBypass()">เริ่มทำงาน (Call API)</button>
+
+    <!-- กล่องแสดงสถานะผลลัพธ์ -->
+    <div id="result" class="result-box"></div>
+</div>
+
+<!-- ข้อความแจ้งเตือนตอนคัดลอกสำเร็จ -->
+<div id="toast" class="toast">คัดลอกคีย์ที่ Bypass ลงเครื่องสำเร็จแล้ว!</div>
+
+<script>
+async function handleBypass() {
+    const apiKey = document.getElementById('apiKey').value.trim();
+    const targetLink = document.getElementById('targetLink').value.trim();
+    const submitBtn = document.getElementById('submitBtn');
+    const resultBox = document.getElementById('result');
+
+    // ตรวจสอบข้อมูลเบื้องต้น
+    if (!apiKey) {
+        showResult('กรุณาใส่ API Key ก่อนครับ', false);
+        return;
+    }
+    if (!targetLink) {
+        showResult('กรุณาใส่ลิงก์ที่ต้องการทำรายการ', false);
+        return;
+    }
+
+    // เปิดสถานะกำลังโหลด
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'กำลังประมวลผล...';
+    resultBox.style.display = 'none';
+
+    // ⚠️ หมายเหตุ: ปรับเปลี่ยน URL ตรงนี้ตามเอกสาร API จริงของ KAITUNMOBILE
+    const apiUrl = 'https://api.kaitunmobile.com/v1/bypass'; 
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}` // การยืนยันตัวตน (เปลี่ยนตามรูปแบบที่เว็บกำหนด)
+            },
+            body: JSON.stringify({
+                url: targetLink
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // 💡 สมมติว่าข้อมูลคีย์ที่ได้กลับมาอยู่ในตัวแปร data.key หรือ data.result
+            // รบกวนคุณเช็คแกะโครงสร้าง Object ของ KAITUNMOBILE อีกครั้งนะครับ
+            const bypassedKey = data.key || data.result || JSON.stringify(data);
+
+            showResult('ทำรายการสำเร็จ! ระบบได้คัดลอกคีย์ให้ท่านแล้ว', true);
+            
+            // สั่งคัดลอกคีย์ลง Clipboard ทันที
+            copyToClipboard(bypassedKey);
+        } else {
+            showResult(`ข้อผิดพลาดจากระบบ: ${data.message || 'ไม่สามารถดึงข้อมูลได้'}`, false);
+        }
+
+    } catch (error) {
+        console.error(error);
+        showResult('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', false);
+    } finally {
+        // คืนค่าปุ่มให้กดใหม่ได้
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'เริ่มทำงาน (Call API)';
+    }
+}
+
+// ฟังก์ชันสำหรับแสดงข้อความบนหน้าจอ
+function showResult(message, isSuccess) {
+    const resultBox = document.getElementById('result');
+    resultBox.innerText = message;
+    resultBox.className = 'result-box ' + (isSuccess ? 'success' : 'error');
+    resultBox.style.display = 'block';
+}
+
+// ฟังก์ชันสำหรับคัดลอกข้อความอัตโนมัติ (Copy to Clipboard)
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        // แสดง Toast แจ้งเตือนสั้นๆ ด้านล่างจอ
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 2000);
+    }).catch(err => {
+        console.error('ไม่สามารถคัดลอกอัตโนมัติได้: ', err);
+    });
+}
+</script>
+
+</body>
+</html>
