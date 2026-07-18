@@ -1,3 +1,22 @@
+--[[
+getgenv().abc = {
+  ["AutoFarm"] = true,
+  ["HopServer"] = false,
+  ["Price"] = 17000,
+  ["AutoBuyGarage"] = true,
+  ["Codes"] = {
+    "100M",
+    "SAUSAGE",
+    "WATERLAVA",
+    "RENASCAPTURADO",
+    "UPDATEPLS",
+    "Sorry"
+  }
+}
+loadstring(game:HttpGet('https://idkkub.netlify.app/raw/fixitup.lua'))();
+]]
+
+
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
@@ -165,8 +184,10 @@ local function teleportToLowPlayerServer()
 end
 
 spawn(function()
-task.wait(1800)
-teleportToLowPlayerServer()
+  if getgenv().abc.HopServer == true then
+    task.wait(1800)
+    teleportToLowPlayerServer()
+  end
 end)
 
 task.spawn(function()
